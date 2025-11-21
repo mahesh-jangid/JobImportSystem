@@ -1,25 +1,15 @@
-import { Queue, Worker, QueueScheduler } from 'bullmq';
+import { Queue, Worker } from 'bullmq';
 import { getRedisClient } from '../config/redis';
 
 export class QueueManager {
   private queue: Queue | null = null;
   private worker: Worker | null = null;
-  private scheduler: QueueScheduler | null = null;
-
   async initializeQueue(queueName: string = 'job-import') {
     try {
       const redisClient = getRedisClient();
 
       // Create queue
       this.queue = new Queue(queueName, {
-        connection: {
-          host: process.env.REDIS_HOST || 'localhost',
-          port: parseInt(process.env.REDIS_PORT || '6379'),
-        },
-      });
-
-      // Create scheduler
-      this.scheduler = new QueueScheduler(queueName, {
         connection: {
           host: process.env.REDIS_HOST || 'localhost',
           port: parseInt(process.env.REDIS_PORT || '6379'),
@@ -68,8 +58,6 @@ export class QueueManager {
 
   async closeQueue() {
     if (this.worker) await this.worker.close();
-    if (this.scheduler) await this.scheduler.close();
-    if (this.queue) await this.queue.close();
     console.log('✅ Queue closed');
   }
 
