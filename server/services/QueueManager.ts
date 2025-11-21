@@ -66,7 +66,7 @@ export class QueueManager {
       throw new Error('Queue not initialized');
     }
 
-    const counts = await this.queue.getCountsPerStatus();
+    const counts = await this.queue.getJobCounts();
     return {
       active: counts.active,
       waiting: counts.waiting,
